@@ -1,10 +1,17 @@
-import { Client, Account } from 'appwrite';
+import { Client, Account } from "appwrite";
 
-export const client = new Client();
+const client = new Client()
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT)
+  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID);
 
-client
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('670b5bbe0005f8a425f8'); 
+const account = new Account(client);
 
-export const account = new Account(client);
-export { ID } from 'appwrite';
+const loginWithGoogle = () => {
+  account.createOAuth2Session(
+    'google',
+    'http://localhost:3000/dashboard',  // Replace with your production URL when ready
+    'http://localhost:3000/failed'
+  );
+};
+
+export { client, account, loginWithGoogle };
