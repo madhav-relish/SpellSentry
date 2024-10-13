@@ -13,7 +13,12 @@ app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
     res.send("SpellSenty backend API is up and running!");
-  });
+});
+
+app.get("/api/health", (req, res) => {
+    res.send({ status: "ok" });
+});
+
 
 
 app.use('/api', aiAnalysis);
