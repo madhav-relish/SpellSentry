@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeChanger } from "@/components/ThemeChanger";
+import { SessionProvider } from "next-auth/react";
+import Provider from "@/providers/provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,15 +28,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistMono.className}`}>
-      <ThemeProvider
+      <Provider>
+          <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-          <ThemeChanger/>
-        {children}
-        </ThemeProvider>
+            <ThemeChanger />
+            {children}
+          </ThemeProvider>
+        </Provider>
       </body>
     </html>
   );
