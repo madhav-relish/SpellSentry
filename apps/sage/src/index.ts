@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import aiAnalysis from './routes/router';
+import cors from 'cors'
 
 
 dotenv.config();
@@ -9,6 +10,7 @@ dotenv.config();
 const app: Application = express();
 const port = process.env.PORT || 9001;
 
+app.use(cors())
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
