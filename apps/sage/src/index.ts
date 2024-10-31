@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import aiAnalysis from './routes/huggingFaceAnalysis';
+import aiAnalysis from './routes/router';
 
 
 dotenv.config();
@@ -27,4 +27,3 @@ app.use('/api', aiAnalysis);
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
