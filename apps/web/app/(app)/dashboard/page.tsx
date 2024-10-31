@@ -21,30 +21,31 @@ function TextAnalysisApp() {
 
   const handleAnalyze = async () => {
     try {
-      const response = await axios.post('http://localhost:9001/api/analyze', { url });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/analyze`, { url });
       setAnalyzeResult(response.data.analysis);
     } catch (error) {
       console.error('Error analyzing text:', error);
     }
   };
-
+  
   const handleFetchAndClean = async () => {
     try {
-      const response = await axios.post('http://localhost:9001/api/fetch-and-clean', { url });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/fetch-and-clean`, { url });
       setCleanedText(response.data.cleanedText);
     } catch (error) {
       console.error('Error fetching and cleaning HTML:', error);
     }
   };
-
+  
   const handleAnalyzeTone = async () => {
     try {
-      const response = await axios.post('http://localhost:9001/api/analyze-tone', { text });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/analyze-tone`, { text });
       setToneAnalysis(response.data);
     } catch (error) {
       console.error('Error analyzing tone:', error);
     }
   };
+  
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
