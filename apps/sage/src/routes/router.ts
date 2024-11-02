@@ -5,8 +5,38 @@ import { analyzeTextWithHuggingFace } from '../services/huggingFaceService';
 import { fetchAndCleanHTML } from '../services/fetchAndClean';
 import { analyzeSpellingAndGrammar } from '../services/analyzeText';
 import { analyzeTone } from "../services/analyzeTone"
+import { scanWebsite } from '../services/scan-website';
+import { scanRequestSchema } from '../schema';
 
 const router = Router();
+
+//@ts-ignore
+router.post('/scan', async (req: Request, res: Response) => {
+  try {
+    const parseResult = scanRequestSchema.safeParse(req.body);
+    
+    if (!parseResult.success) {
+      return res.status(400).json({ 
+        success: false, 
+        error: parseResult.error.message 
+      });
+    }
+
+    const { url } = parseResult.data;
+    const results = await scanWebsite(url);
+    
+    return res.json({ 
+      success: true, 
+      data: results 
+    });
+  } catch (error) {
+    console.error('Error scanning website:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to scan website' 
+    });
+  }
+});
 
 router.post('/analyze', async (req: Request, res: Response) => {
   const { url } = req.body;
@@ -90,5 +120,6 @@ router.post('/analyze-spelling-grammar', async (req: Request, res: Response): Pr
     });
   }
 });
+
 
 export default router;
