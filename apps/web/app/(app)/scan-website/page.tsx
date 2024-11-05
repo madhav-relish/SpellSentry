@@ -7,10 +7,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { scanWebsiteSchema, type ScanWebsiteInput, type ScanResult } from "@/lib/schema";
-import { toastError, toastSuccess } from "@/components/ui/toast";
 import axios from "axios";
+import { toast } from "sonner";
 
-export const WebsiteScanner = () => {
+ const WebsiteScanner = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [results, setResults] = useState<ScanResult | null>(null);
 
@@ -28,12 +28,9 @@ export const WebsiteScanner = () => {
         console.log(data)
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scan`, data);
       setResults(response.data.data);
-      toastSuccess({
-        description: "Website scanned successfully!",
-      });
+    toast.success("Website scanned successfully")
     } catch (error) {
-      toastError({
-        title: "Error scanning website",
+      toast.error("Error scanning website",{
         description: error instanceof Error ? error.message : "An error occurred",
       });
     } finally {

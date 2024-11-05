@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeChanger } from "@/components/ThemeChanger";
 import { SessionProvider } from "next-auth/react";
 import Provider from "@/providers/provider";
-import { Toaster } from "sonner"
+import { Toaster } from "@/components/ui/sonner"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
