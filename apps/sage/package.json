@@ -1,13 +1,16 @@
 {
-  "name": "starter-template",
+  "name": "sage",
   "version": "1.0.0",
   "description": "",
-  "main": "src/main.js",
-  "type": "module",
+  "main": "index.js",
   "scripts": {
+     "dev": "npx ts-node-dev src/index.ts",
     "format": "prettier --write .",
     "build": "npx tsc -b"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "axios": "^1.7.7",
