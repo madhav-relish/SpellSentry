@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import React, { useState } from "react";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface ToneAnalysis {
   toneAnalysis: { label: string; score: number }[];
@@ -13,39 +13,47 @@ interface ToneAnalysis {
 }
 
 function TextAnalysisApp() {
-  const [url, setUrl] = useState('');
-  const [text, setText] = useState('');
+  const [url, setUrl] = useState("");
+  const [text, setText] = useState("");
   const [analyzeResult, setAnalyzeResult] = useState(null);
   const [cleanedText, setCleanedText] = useState(null);
   const [toneAnalysis, setToneAnalysis] = useState<ToneAnalysis | null>(null);
 
   const handleAnalyze = async () => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/analyze`, { url });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/analyze`,
+        { url }
+      );
       setAnalyzeResult(response.data.analysis);
     } catch (error) {
-      console.error('Error analyzing text:', error);
+      console.error("Error analyzing text:", error);
     }
   };
-  
+
   const handleFetchAndClean = async () => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/fetch-and-clean`, { url });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/fetch-and-clean`,
+        { url }
+      );
       setCleanedText(response.data.cleanedText);
     } catch (error) {
-      console.error('Error fetching and cleaning HTML:', error);
+      console.error("Error fetching and cleaning HTML:", error);
     }
   };
-  
+
   const handleAnalyzeTone = async () => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/analyze-tone`, { text });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/analyze-tone`,
+        { text }
+      );
       setToneAnalysis(response.data);
     } catch (error) {
-      console.error('Error analyzing tone:', error);
+      console.error("Error analyzing tone:", error);
     }
   };
-  
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
@@ -56,11 +64,11 @@ function TextAnalysisApp() {
           <CardTitle>Analyze URL</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input 
-            type="text" 
-            placeholder="Enter URL" 
-            value={url} 
-            onChange={(e) => setUrl(e.target.value)} 
+          <Input
+            type="text"
+            placeholder="Enter URL"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
           />
           <Button className="w-full" onClick={handleAnalyze}>
             Analyze Text with Hugging Face
@@ -76,11 +84,11 @@ function TextAnalysisApp() {
           <CardTitle>Analyze Tone</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input 
-            type="text" 
-            placeholder="Enter text for tone analysis" 
-            value={text} 
-            onChange={(e) => setText(e.target.value)} 
+          <Input
+            type="text"
+            placeholder="Enter text for tone analysis"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           />
           <Button className="w-full" onClick={handleAnalyzeTone}>
             Analyze Tone
@@ -97,7 +105,9 @@ function TextAnalysisApp() {
               <CardTitle>Analysis Result</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">{JSON.stringify(analyzeResult, null, 2)}</pre>
+              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">
+                {JSON.stringify(analyzeResult, null, 2)}
+              </pre>
             </CardContent>
           </Card>
         )}
@@ -108,7 +118,9 @@ function TextAnalysisApp() {
               <CardTitle>Cleaned HTML Text</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">{cleanedText}</pre>
+              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">
+                {cleanedText}
+              </pre>
             </CardContent>
           </Card>
         )}
@@ -119,8 +131,12 @@ function TextAnalysisApp() {
               <CardTitle>Tone Analysis</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="font-medium">Highest Tone: {toneAnalysis.highestTone}</p>
-              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">{JSON.stringify(toneAnalysis.toneAnalysis, null, 2)}</pre>
+              <p className="font-medium">
+                Highest Tone: {toneAnalysis.highestTone}
+              </p>
+              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">
+                {JSON.stringify(toneAnalysis.toneAnalysis, null, 2)}
+              </pre>
             </CardContent>
           </Card>
         )}
