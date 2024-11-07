@@ -85,8 +85,8 @@ export default function ScanWebsitePage() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Scan Website</h1>
+    <div className="container mx-auto max-w-5xl p-6">
+      <h1 className="text-2xl font-bold mb-6">Enter your website url</h1>
 
       <Card className="p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -144,7 +144,9 @@ export default function ScanWebsitePage() {
               <h3 className="font-medium mb-2">Grammatical Mistakes Found:</h3>
               <div className="space-y-2">
                 {grammaticalErrors.length === 0 ? (
-                  <div>Wohoo! Grammer on your page seems correct! </div>
+                  <div className="flex justify-center items-center p-3 bg-red-50 rounded-md h-28 text-black">
+                    Wohoo! Grammar on your page seems correct!🚀{" "}
+                    </div>
                 ) : (
                   grammaticalErrors?.map((error, index) => (
                     <div key={index} className="p-3 bg-yellow-50 rounded-md">
