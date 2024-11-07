@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { addWebsite, getWebsites } from "@/lib/api/websites/controller";
 import { validateAddWebsite } from "@/lib/api/websites/validator";
 
