@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
     "prisma:migrate": "prisma migrate deploy", 
     "prisma:generate": "prisma generate", 
+    "dev": "next dev --turbo",
+    "build": "npm run prisma:generate && next build",
     "start": "npm run prisma:migrate && npm run prisma:generate && next start", 
     "lint": "next lint"
   },
