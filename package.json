@@ -1,5 +1,5 @@
 {
-  "name": "SpellSentry",
+  "name": "spell-sentry",
   "private": true,
   "scripts": {
     "build": "turbo build",
