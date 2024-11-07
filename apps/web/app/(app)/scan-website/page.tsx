@@ -72,7 +72,6 @@ export default function ScanWebsitePage() {
 
       setSpellingErrors(spelling);
       setGrammaticalErrors(grammar);
-      console.log(scanResult.data);
       toast.success("Website scanned successfully!");
     } catch (error) {
       console.error("Error scanning website:", error);

@@ -70,8 +70,6 @@ export async function checkGrammar(text: string): Promise<GrammarCheckResponse> 
     const response = result.response;
     const textResponse = response.text();
     
-    console.log("AI Response:", textResponse);
-    
     // Extract JSON from the response
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {

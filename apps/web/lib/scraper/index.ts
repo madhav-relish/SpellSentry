@@ -1,4 +1,3 @@
-import * as cheerio from "cheerio";
 
 function cleanMarkdown(markdown: string): string {
   return markdown
@@ -36,8 +35,6 @@ export async function scrapeWebsite(url: string): Promise<string> {
     
     // Clean the markdown to get only relevant content
     const cleanedContent = cleanMarkdown(markdown);
-    
-    console.log("Cleaned Content::", cleanedContent);
 
     return cleanedContent;
   } catch (error) {

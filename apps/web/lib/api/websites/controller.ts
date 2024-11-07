@@ -40,8 +40,6 @@ export async function scanWebsite(websiteId: string): Promise<Scan> {
   const content = await scrapeWebsite(website.url);
   const result = await checkGrammar(content);
 
-  console.log("AI Result", result);
-
   const scan = await prisma.scan.create({
     data: {
       websiteId,
