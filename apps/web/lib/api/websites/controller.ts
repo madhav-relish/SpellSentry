@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { Website, Scan } from "@prisma/client";
 import { scrapeWebsite } from "@/lib/scraper";
 import { checkGrammar } from "@/lib/ai/grammar-check";
-import { GrammarError } from '@/lib/types/grammar';
 
 export async function getWebsites(userId: string): Promise<Website[]> {
   return prisma.website.findMany({
@@ -39,19 +38,32 @@ export async function scanWebsite(websiteId: string): Promise<Scan> {
   }
 
   const content = await scrapeWebsite(website.url);
-  const grammarErrors = await checkGrammar(content);
+  const result = await checkGrammar(content);
+
+  console.log("AI Result", result);
 
   const scan = await prisma.scan.create({
     data: {
       websiteId,
       content,
       errors: {
-        create: grammarErrors.map((error: GrammarError) => ({
-          word: error.word,
-          suggestion: error.suggestion,
-          context: error.context,
-          position: error.position,
-        })),
+        create: [
+          ...result.spelling.map(error => ({
+            word: error.word,
+            suggestion: error.suggestion,
+            context: error.context,
+            position: error.position,
+            type: 'spelling'
+          })),
+          ...result.grammar.map(error => ({
+            word: error.phrase,
+            suggestion: error.suggestion,
+            context: error.context,
+            position: error.position,
+            type: 'grammar',
+            explanation: error.explanation
+          }))
+        ],
       },
     },
     include: {

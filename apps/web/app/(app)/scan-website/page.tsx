@@ -19,6 +19,8 @@ type ScanWebsiteInputs = z.infer<typeof scanWebsiteSchema>;
 export default function ScanWebsitePage() {
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
+  const [spellingErrors, setSpellingErrors] =  useState<any[]>([]);
+  const [grammaticalErrors, setGrammaticalErrors] =  useState<any[]>([]);
 
   const {
     register,
@@ -57,6 +59,13 @@ export default function ScanWebsitePage() {
       }
 
       setScanResult(scanResult.data);
+          // Separate errors based on type
+          const spelling = scanResult.data.errors.filter((error: any) => error.type === 'spelling');
+          const grammar = scanResult.data.errors.filter((error: any) => error.type === 'grammar');
+    
+          setSpellingErrors(spelling);
+          setGrammaticalErrors(grammar);
+      console.log(scanResult.data)
       toast.success('Website scanned successfully!');
     } catch (error) {
       console.error('Error scanning website:', error);
@@ -95,20 +104,33 @@ export default function ScanWebsitePage() {
       {scanResult && (
         <Card className="mt-6 p-6">
           <h2 className="text-xl font-semibold mb-4">Scan Results</h2>
-          <div className="space-y-4">
+          <div className="space-y-4">            
             <div>
-              <h3 className="font-medium mb-2">Content:</h3>
-              <p className="text-sm text-gray-600">{scanResult.content.substring(0, 200)}...</p>
-            </div>
-            
-            <div>
-              <h3 className="font-medium mb-2">Errors Found:</h3>
+              <h3 className="font-medium mb-2">Spelling Mistakes Found:</h3>
               <div className="space-y-2">
-                {scanResult.errors.map((error: any, index: number) => (
+              {spellingErrors.length === 0 ?
+                <div className='p-3 bg-red-50 rounded-md h-10'>Wohoo! Spellings on your page seems correct! </div>
+                :spellingErrors?.map((error, index) => (
                   <div key={index} className="p-3 bg-red-50 rounded-md">
-                    <p className="text-red-600 font-medium">{error.word}</p>
+                  <p className="text-red-600 font-medium">  <span>Error:</span>{error.word}</p>
+                   <p className="text-green-600 font-medium"> <span>Suggestion: </span>{error.suggestion}</p>
+                    <p className="text-xs text-gray-500">Where: {error.context}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-medium mb-2">Grammatical Mistakes Found:</h3>
+              <div className="space-y-2">
+                {grammaticalErrors.length === 0 ?
+                <div>Wohoo! Grammer on your page seems correct! </div>
+                : grammaticalErrors?.map((error, index) => (
+                  <div key={index} className="p-3 bg-yellow-50 rounded-md">
+                    <p className="text-yellow-600 font-medium">{error.word}</p>
                     <p className="text-sm text-gray-600">Suggestion: {error.suggestion}</p>
                     <p className="text-xs text-gray-500">Context: {error.context}</p>
+                    <p className="text-xs text-gray-500">Explaination: {error.explanation}</p>
                   </div>
                 ))}
               </div>

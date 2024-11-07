@@ -1,31 +1,48 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GrammarError, GrammarCheckResponse } from '../types/grammar';
+import { GrammarCheckResponse } from '../types/grammar';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-export async function checkGrammar(text: string): Promise<GrammarError[]> {
+export async function checkGrammar(text: string): Promise<GrammarCheckResponse> {
   try {
     const prompt = `
-      You are a professional editor. Your task is to analyze the following text for grammar and spelling errors.
+      You are a professional editor. Analyze the following text for both spelling and grammatical errors.
       
       Rules:
-      1. Focus on grammar, spelling, and punctuation errors
-      2. Provide clear, actionable suggestions for improvements
-      3. Include context around each error
-      4. Be precise with error positions
+      1. Separate spelling errors from grammatical errors
+      2. For spelling errors:
+         - Identify misspelled words
+         - Provide correct spelling
+         - Show context
+      3. For grammar errors:
+         - Identify incorrect grammar
+         - Provide correction
+         - Explain the rule being violated
+         - Show context
+      4. Be thorough - catch ALL errors
+      5. Include position numbers
       
       Text to analyze:
       ${text}
       
       Return ONLY a JSON response with this exact structure:
       {
-        "errors": [
+        "spelling": [
           {
-            "word": "incorrect word or phrase",
-            "suggestion": "corrected version",
+            "word": "misspelled word",
+            "suggestion": "correct spelling",
             "context": "... text before [error] text after ...",
             "position": number
+          }
+        ],
+        "grammar": [
+          {
+            "phrase": "incorrect grammar",
+            "suggestion": "correct grammar",
+            "context": "... text before [error] text after ...",
+            "position": number,
+            "explanation": "explanation of the grammar rule"
           }
         ]
       }`;
@@ -34,6 +51,8 @@ export async function checkGrammar(text: string): Promise<GrammarError[]> {
     const response = result.response;
     const textResponse = response.text();
     
+    console.log("AI Response:", textResponse);
+    
     // Extract JSON from the response
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
@@ -41,7 +60,7 @@ export async function checkGrammar(text: string): Promise<GrammarError[]> {
     }
     
     const parsedResponse = JSON.parse(jsonMatch[0]) as GrammarCheckResponse;
-    return parsedResponse.errors;
+    return parsedResponse;
   } catch (error) {
     console.error('Error checking grammar:', error);
     throw new Error('Failed to check grammar');

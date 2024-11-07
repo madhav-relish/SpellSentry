@@ -73,11 +73,13 @@ model Scan {
 }
 
 model SpellingError {
-  id         String   @id @default(cuid())
-  scanId     String
-  word       String
-  suggestion String
-  context    String
-  position   Int
-  scan       Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  scanId      String
+  word        String
+  suggestion  String
+  context     String
+  position    Int
+  type        String   // 'spelling' or 'grammar'
+  explanation String?  // Only for grammar errors
+  scan        Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
 } 
