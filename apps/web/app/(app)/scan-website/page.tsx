@@ -1,102 +1,174 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { z } from "zod";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { scanWebsiteSchema, type ScanWebsiteInput, type ScanResult } from "@/lib/schema";
-import axios from "axios";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
- const WebsiteScanner = () => {
+// Define form schema
+const scanWebsiteSchema = z.object({
+  url: z.string().url("Please enter a valid URL"),
+});
+
+type ScanWebsiteInputs = z.infer<typeof scanWebsiteSchema>;
+
+export default function ScanWebsitePage() {
   const [isScanning, setIsScanning] = useState(false);
-  const [results, setResults] = useState<ScanResult | null>(null);
+  const [scanResult, setScanResult] = useState<any>(null);
+  const [spellingErrors, setSpellingErrors] = useState<any[]>([]);
+  const [grammaticalErrors, setGrammaticalErrors] = useState<any[]>([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ScanWebsiteInput>({
+  } = useForm<ScanWebsiteInputs>({
     resolver: zodResolver(scanWebsiteSchema),
   });
 
-  const onSubmit = useCallback(async (data: ScanWebsiteInput) => {
-    setIsScanning(true);
+  const onSubmit: SubmitHandler<ScanWebsiteInputs> = async (data) => {
     try {
-        console.log(data)
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scan`, data);
-      setResults(response.data.data);
-    toast.success("Website scanned successfully")
-    } catch (error) {
-      toast.error("Error scanning website",{
-        description: error instanceof Error ? error.message : "An error occurred",
+      setIsScanning(true);
+
+      // First add the website
+      const addResponse = await fetch("/api/websites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: data.url }),
       });
+
+      const addResult = await addResponse.json();
+
+      if (!addResponse.ok) {
+        throw new Error(addResult.error || "Failed to add website");
+      }
+
+      // Then scan it
+      const scanResponse = await fetch(
+        `/api/websites/${addResult.data.id}/scan`,
+        {
+          method: "POST",
+        }
+      );
+
+      const scanResult = await scanResponse.json();
+
+      if (!scanResponse.ok) {
+        throw new Error(scanResult.error || "Failed to scan website");
+      }
+
+      setScanResult(scanResult.data);
+      // Separate errors based on type
+      const spelling = scanResult.data.errors.filter(
+        (error: any) => error.type === "spelling"
+      );
+      const grammar = scanResult.data.errors.filter(
+        (error: any) => error.type === "grammar"
+      );
+
+      setSpellingErrors(spelling);
+      setGrammaticalErrors(grammar);
+      toast.success("Website scanned successfully!");
+    } catch (error) {
+      console.error("Error scanning website:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to scan website"
+      );
     } finally {
       setIsScanning(false);
     }
-  }, []);
+  };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">Website Grammar Scanner</h1>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Scan Website</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div className="container mx-auto max-w-5xl p-6">
+      <h1 className="text-2xl font-bold mb-6">Enter your website url</h1>
+
+      <Card className="p-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
             <Input
               type="url"
-              placeholder="Enter website URL"
+              placeholder="https://example.com"
               {...register("url")}
+              className={errors.url ? "border-red-500" : ""}
             />
-            <Button type="submit" disabled={isScanning}>
-              {isScanning ? "Scanning..." : "Scan Website"}
-            </Button>
-          </form>
-        </CardContent>
+            {errors.url && (
+              <p className="text-sm text-red-500">{errors.url.message}</p>
+            )}
+          </div>
+          <Button type="submit" disabled={isScanning}>
+            {isScanning ? "Scanning..." : "Scan Website"}
+          </Button>
+        </form>
       </Card>
 
-      {results && (
-        <div className="mt-8 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Spelling Errors</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-4 space-y-2">
-                {results.spelling.map((error, i) => (
-                  <li key={i}>
-                    <span className="text-red-500">{error.incorrect}</span> →{" "}
-                    <span className="text-green-500">{error.correction}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+      {scanResult && (
+        <Card className="mt-6 p-6">
+          <h2 className="text-xl font-semibold mb-4">Scan Results</h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-medium mb-2">Spelling Mistakes Found:</h3>
+              <div className="space-y-2">
+                {spellingErrors.length === 0 ? (
+                  <div className="flex justify-center items-center p-3 bg-red-50 rounded-md h-28 text-black">
+                    Wohoo! Spellings on your page seems correct!🚀{" "}
+                  </div>
+                ) : (
+                  spellingErrors?.map((error, index) => (
+                    <div key={index} className="p-3 bg-red-50 rounded-md">
+                      <p className="text-red-600 font-medium">
+                        {" "}
+                        <span>Error:</span>
+                        {error.word}
+                      </p>
+                      <p className="text-green-600 font-medium">
+                        {" "}
+                        <span>Suggestion: </span>
+                        {error.suggestion}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Where: {error.context}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Grammar Errors</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-4 space-y-2">
-                {results.grammar.map((error, i) => (
-                  <li key={i}>
-                    <span className="text-red-500">{error.incorrect}</span> →{" "}
-                    <span className="text-green-500">{error.correction}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+            <div>
+              <h3 className="font-medium mb-2">Grammatical Mistakes Found:</h3>
+              <div className="space-y-2">
+                {grammaticalErrors.length === 0 ? (
+                  <div className="flex justify-center items-center p-3 bg-red-50 rounded-md h-28 text-black">
+                    Wohoo! Grammar on your page seems correct!🚀{" "}
+                    </div>
+                ) : (
+                  grammaticalErrors?.map((error, index) => (
+                    <div key={index} className="p-3 bg-yellow-50 rounded-md">
+                      <p className="text-yellow-600 font-medium">
+                        {error.word}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Suggestion: {error.suggestion}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Context: {error.context}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Explaination: {error.explanation}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );
-};
-
-export default WebsiteScanner;
+}

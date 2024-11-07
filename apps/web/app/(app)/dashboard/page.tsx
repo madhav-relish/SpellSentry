@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 interface ToneAnalysis {
   toneAnalysis: { label: string; score: number }[];
@@ -57,90 +58,15 @@ function TextAnalysisApp() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
-      <h1 className="text-2xl font-semibold text-center">Text Analysis Tool</h1>
-
+      <h1 className="text-2xl font-semibold text-center">Available Services</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Analyze URL</CardTitle>
+          <CardTitle>Grammer and Spell Checker</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Enter URL"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <Button className="w-full" onClick={handleAnalyze}>
-            Analyze Text with Hugging Face
-          </Button>
-          <Button className="w-full" onClick={handleFetchAndClean}>
-            Fetch and Clean HTML
-          </Button>
+         <Link href={'/scan-website'} className="button "><Button>Get started Now</Button></Link>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Analyze Tone</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Enter text for tone analysis"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <Button className="w-full" onClick={handleAnalyzeTone}>
-            Analyze Tone
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Separator />
-
-      <div className="space-y-6">
-        {analyzeResult && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Analysis Result</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">
-                {JSON.stringify(analyzeResult, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        )}
-
-        {cleanedText && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Cleaned HTML Text</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">
-                {cleanedText}
-              </pre>
-            </CardContent>
-          </Card>
-        )}
-
-        {toneAnalysis && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Tone Analysis</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="font-medium">
-                Highest Tone: {toneAnalysis.highestTone}
-              </p>
-              <pre className="text-sm bg-gray-600 p-4 rounded whitespace-pre-wrap break-words overflow-x-auto">
-                {JSON.stringify(toneAnalysis.toneAnalysis, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        )}
-      </div>
     </div>
   );
 }

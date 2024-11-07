@@ -1,22 +1,25 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "ui": "tui",
+  "globalDependencies": [
+    ".env"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [
-        "apps/web/.next/**",  
-        "apps/sage/dist/**",    
-        "!apps/web/.next/cache/**" 
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "NEXTAUTH_SECRET",
+        "NEXTAUTH_URL",
+        "DATABASE_URL",
+        "GEMINI_API_KEY",
+        "NODE_ENV"
       ]
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
     },
     "dev": {
       "cache": false,
       "persistent": true
-    } 
+    }
   }
 }
