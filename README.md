@@ -1,6 +1,6 @@
 # SpellSentry
 
-adding spme wrongg speelss in readme
+adding spme wrongg speelinss in readme
 
 you was see wrong grammer
 
