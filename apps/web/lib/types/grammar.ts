@@ -3,6 +3,7 @@ export interface SpellingError {
   suggestion: string;
   context: string;
   position: number;
+  language: string;
 }
 
 export interface GrammarError {
@@ -11,9 +12,11 @@ export interface GrammarError {
   context: string;
   position: number;
   explanation: string;
+  language: string;
 }
 
 export interface GrammarCheckResponse {
+  languages: string[];
   spelling: SpellingError[];
   grammar: GrammarError[];
 } 
