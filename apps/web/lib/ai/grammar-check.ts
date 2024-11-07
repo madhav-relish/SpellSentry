@@ -17,6 +17,7 @@ export async function checkGrammar(text: string): Promise<GrammarCheckResponse> 
          - Verb tense errors (e.g., "I been" → "I have been").
          - Article usage (e.g., "I saw dog" → "I saw a dog").
          - Word order (e.g., "car red" → "red car").
+         - If multiple mistakes are there in a sentence then just give the correct sentence with all the correct changes.
       4. Spelling errors include:
          - Wrong letters (e.g., "speeling" → "spelling").
          - Double/single letter errors (e.g., "grammer" → "grammar").
@@ -26,12 +27,13 @@ export async function checkGrammar(text: string): Promise<GrammarCheckResponse> 
       
       Important:
       - Each error should only appear in either spelling OR grammar category.
-      - Understand the context of the sentence first before making any decision.
+      - Understand the correct answers with the context of the sentence first and check whether it makes sense or not before making any decision.
       - If an error is in a different language, the correct result and explanation should ONLY be provided in that language. For example, if the error is in Spanish, the suggestion and explanation should also be in Spanish.
       - Misspelled words go in "spelling".
       - Incorrect phrases/sentences go in "grammar".
       - Include clear explanations for grammar errors.
       - Double-check all suggestions.
+      - Maintain the JSON Format
       
 
       ----------------------------------------------------
@@ -48,7 +50,7 @@ export async function checkGrammar(text: string): Promise<GrammarCheckResponse> 
             "word": "misspelled word",
             "suggestion": "correct spelling",
             "correct_sentence": "Add the correct sentence with the correct spelling"
-            "context": "... text before [error] text after ...",
+            "context": "... text before [error] text after ..." || "",
             "position": number,
             "language": "language code"
           }
@@ -57,7 +59,7 @@ export async function checkGrammar(text: string): Promise<GrammarCheckResponse> 
           {
             "phrase": "incorrect phrase",
             "suggestion": "correct phrase",
-            "context": "... text before [error] text after ...",
+            "context": "... text before [error] text after ..." || "",
             "position": number,
             "explanation": "detailed explanation in the same language as the error",
             "language": "language code"
