@@ -3,11 +3,18 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
+    // Check if the request is for the root path
+    if (req.nextUrl.pathname === '/') {
+      // Redirect to /dashboard
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+
+    // Allow other requests to proceed
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: () => true, // Allow access to all routes
     },
     pages: {
       signIn: "/login",
@@ -20,6 +27,6 @@ export const config = {
     "/dashboard/:path*",
     "/scan-website/:path*",
     "/api/websites/:path*",
-    // Add other protected routes here
+    "/:path*", // Match all paths to handle the root redirection
   ],
 }; 
