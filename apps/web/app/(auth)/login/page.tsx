@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { signIn } from "next-auth/react";
+import { FaGoogle } from "react-icons/fa";
 
 export default function LoginPage() {
   const handleSignIn = () => {
@@ -15,7 +16,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary">
+    <div className="flex min-h-screen items-center justify-center ">
       <Card className="w-full max-w-md p-6">
         <h1 className="text-2xl font-bold text-center mb-6">Welcome to SpellSentry</h1>
         <p className="text-center text-muted-foreground mb-6">
@@ -25,7 +26,11 @@ export default function LoginPage() {
           className="w-full"
           onClick={handleSignIn}
         >
-          Sign in with Google
+          <span className="mr-2">
+              {" "}
+              <FaGoogle />
+            </span>
+          Sign in with Google  
         </Button>
       </Card>
     </div>
