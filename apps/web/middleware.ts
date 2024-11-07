@@ -14,10 +14,16 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: () => true, // Allow access to all routes
+      authorized: ({ token }) => {
+        // Check if the token is valid
+        if (!token) {
+          return false; // Redirect to sign-in page if no token
+        }
+        return true; // Allow access if token is valid
+      },
     },
     pages: {
-      signIn: "/login",
+      signIn: "/login", // Redirect to this page if not authorized
     },
   }
 );
