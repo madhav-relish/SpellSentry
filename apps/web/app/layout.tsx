@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeChanger } from "@/components/ThemeChanger";
 import AuthProvider from "@/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/Navbar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,7 +36,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ThemeChanger />
+            <Navbar/>
             <Toaster />
             {children}
           </ThemeProvider>
