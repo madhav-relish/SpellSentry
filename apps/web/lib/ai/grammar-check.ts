@@ -9,10 +9,10 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationCo
 export async function checkGrammar(text: string): Promise<GrammarCheckResponse> {
   try {
     const prompt = `
-      You are an editor. Analyze the following text (in markdown format) for spelling and grammatical errors.
-      
+      You are an editor. Analyze the following text (in markdown format) for spelling and grammatical errors, but only report actual mistakes.
+
       ### Instructions:
-      1. Identify the language of the text. If there are multiple languages, analyze each separately.
+      1. Identify the language of the text. If there are multiple languages, analyze each separately in that language only and provide corrections in the same language as the error.
       2. Check for spelling and grammar errors in one pass.
       3. **Grammar Errors**:
          - Correct subject-verb agreement.
@@ -21,15 +21,15 @@ export async function checkGrammar(text: string): Promise<GrammarCheckResponse> 
          - Adjust word order.
          - Provide the corrected sentence if there are multiple mistakes.
       4. **Spelling Errors**:
-         - Correct wrong letters.
-         - Fix double/single letter errors.
-         - Address missing letters.
-         - Ensure corrections make sense in context.
-      
+         - Only report words that are misspelled or incorrect.
+         - Check for the mistakes in that language only means if something is wrttien in spanish then test it in spanish.
+         - Do not report words that are spelled correctly.
+         - Ensure corrections make sense in context and maintain the original language.
+
       ### Important Notes:
       - Each error should be categorized as either spelling or grammar.
-      - Provide explanations for grammar corrections.
-      - If an error is in a different language, respond in that language.
+      - Provide explanations for grammar corrections in the same language as the error.
+      - If an error is in a different language other than english then respond in that language without translating it to English.
 
       ### Text to Analyze:
       ${text}
