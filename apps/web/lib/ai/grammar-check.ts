@@ -2,55 +2,47 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GrammarCheckResponse } from '../types/grammar';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: {
+    responseMimeType: "application/json"
+} });
 
 export async function checkGrammar(text: string): Promise<GrammarCheckResponse> {
   try {
     const prompt = `
-      You are a professional editor. Analyze the following text (which is in markdown format) for both spelling and grammatical errors.
+      You are an editor. Analyze the following text (in markdown format) for spelling and grammatical errors.
       
-      Analysis Rules:
-      1. Identify the language of the text. If the text contains multiple languages, analyze each language separately.
-      2. For each language, check for both spelling and grammar in a single pass.
-      3. Grammar errors include:
-         - Subject-verb agreement (e.g., "they is" → "they are").
-         - Verb tense errors (e.g., "I been" → "I have been").
-         - Article usage (e.g., "I saw dog" → "I saw a dog").
-         - Word order (e.g., "car red" → "red car").
-         - If multiple mistakes are there in a sentence then just give the correct sentence with all the correct changes.
-      4. Spelling errors include:
-         - Wrong letters (e.g., "speeling" → "spelling").
-         - Double/single letter errors (e.g., "grammer" → "grammar").
-         - Missing letters (e.g., "spel" → "spell").
-         - Check the correct spelling with the sentence where it is being used, add it only if it makes sense otherwise try again with the context of the sentence.
-     
+      ### Instructions:
+      1. Identify the language of the text. If there are multiple languages, analyze each separately.
+      2. Check for spelling and grammar errors in one pass.
+      3. **Grammar Errors**:
+         - Correct subject-verb agreement.
+         - Fix verb tense errors.
+         - Correct article usage.
+         - Adjust word order.
+         - Provide the corrected sentence if there are multiple mistakes.
+      4. **Spelling Errors**:
+         - Correct wrong letters.
+         - Fix double/single letter errors.
+         - Address missing letters.
+         - Ensure corrections make sense in context.
       
-      Important:
-      - Each error should only appear in either spelling OR grammar category.
-      - Understand the correct answers with the context of the sentence first and check whether it makes sense or not before making any decision.
-      - If an error is in a different language, the correct result and explanation should ONLY be provided in that language. For example, if the error is in Spanish, the suggestion and explanation should also be in Spanish.
-      - Misspelled words go in "spelling".
-      - Incorrect phrases/sentences go in "grammar".
-      - Include clear explanations for grammar errors.
-      - Double-check all suggestions.
-      - Maintain the JSON Format
-      
+      ### Important Notes:
+      - Each error should be categorized as either spelling or grammar.
+      - Provide explanations for grammar corrections.
+      - If an error is in a different language, respond in that language.
 
-      ----------------------------------------------------
-      Text to analyze:
+      ### Text to Analyze:
       ${text}
-      
 
-      -----------------------------------------------------
-      Return ONLY a JSON response with this exact structure:
+      ### Expected JSON Format:
       {
         "languages": ["en", "es", ...],
         "spelling": [
           {
             "word": "misspelled word",
             "suggestion": "correct spelling",
-            "correct_sentence": "Add the correct sentence with the correct spelling"
-            "context": "... text before [error] text after ..." || "",
+            "correct_sentence": "Correct sentence with the correct spelling",
+            "context": "... text before [error] text after ...",
             "position": number,
             "language": "language code"
           }
@@ -59,29 +51,26 @@ export async function checkGrammar(text: string): Promise<GrammarCheckResponse> 
           {
             "phrase": "incorrect phrase",
             "suggestion": "correct phrase",
-            "context": "... text before [error] text after ..." || "",
+            "context": "... text before [error] text after ...",
             "position": number,
-            "explanation": "detailed explanation in the same language as the error",
+            "explanation": "Explanation in the same language as the error",
             "language": "language code"
           }
         ]
-      }`;
+      }
+    `;
 
     // Generate content using the AI model
     const result = await model.generateContent(prompt);
     const response = result.response;
     const textResponse = await response.text(); // Await the text response
 
-    console.log("AI Response:", textResponse);
-    
-    // Extract JSON from the response
-    const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No valid JSON found in response');
-    }
-    
-    // Parse the JSON response
-    const parsedResponse = JSON.parse(jsonMatch[0]) as GrammarCheckResponse;
+    // Log the raw response for debugging
+    console.log("Raw AI Response:", textResponse);
+
+    // Parse the JSON response directly
+    const parsedResponse = JSON.parse(textResponse) as GrammarCheckResponse;
+
     return parsedResponse;
   } catch (error) {
     console.error('Error checking grammar:', error);
